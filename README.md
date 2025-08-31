@@ -5,7 +5,7 @@ Overview
 
 Presently is a multimodal AI application that helps users improve their communication skills for interviews, presentations, and public speaking. Using facial emotion recognition, voice tone analysis, and AI-driven coaching, Presently provides real-time feedback to boost confidence and performance.
 
-# Features
+## Features 
 
 Facial Emotion Detection – Analyzes expressions to gauge confidence and engagement.
 
@@ -17,7 +17,7 @@ Real-Time Feedback – Insights delivered immediately after recording.
 
 Privacy-First Design – Processes video/audio locally before analysis.
 
-# Tech Stack
+## Tech Stack
 
 Backend: Flask (Python)
 
