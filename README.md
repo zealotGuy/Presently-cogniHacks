@@ -4,7 +4,6 @@ Presently is an AI-powered communication coach designed to help you become a mor
 ## Key Features
 * Video/Audio Analysis: Presently analyzes your facial expressions, voice tone, voice volume, and spoken content
 * Feedback: The app provides feedback based on your audio level/intensity, confidence, clarity, and effectiveness
-* AI-Powered: 
 
 ## How it was built
 Presently was built using a combination of powerful technologies to create an intelligent coaching experience
