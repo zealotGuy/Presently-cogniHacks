@@ -10,6 +10,7 @@ from facenet_pytorch import MTCNN
 from PIL import Image
 from collections import Counter
 import logging
+import torch
 
 # Initialize logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -40,12 +41,24 @@ def analyze():
             fps = cap.get(cv2.CAP_PROP_FPS)
             frame_idx = 0
             mtcnn = MTCNN(keep_all=True)
-            # Updated to use a public model as a fallback
-            emotion_classifier = pipeline("image-classification", model="microsoft/resnet-50")
+
+            # Check for GPU availability
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            logging.info(f"Device set to use {device}")
+
+            # Updated to use a public model with GPU support
+            emotion_classifier = pipeline("image-classification", model="microsoft/resnet-50", device=0 if device == 'cuda' else -1)
+
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
+
+                # Process every 10th frame
+                if frame_idx % 10 != 0:
+                    frame_idx += 1
+                    continue
+
                 timestamp = frame_idx / fps if fps else frame_idx
                 try:
                     img_pil = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
@@ -67,6 +80,7 @@ def analyze():
                     frame_emotions.append(None)
                     emotion_timestamps.append({'timestamp': round(float(timestamp), 2), 'emotion': None, 'error': str(e)})
                 frame_idx += 1
+
             emotion_counts = Counter([e for e in frame_emotions if e])
             total = sum(emotion_counts.values())
             summary = {}
