@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Emotional Tutor & Career Coach</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d0d0d;
+      color: #e0e0ff;
+    }
+
+    header {
+      background-color: #001f3f;
+      padding: 2rem;
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #00bfff;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      color: #00bfff;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      background-color: #111;
+      color: #e0e0ff;
+      border: 1px solid #00bfff;
+      border-radius: 5px;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    button {
+      background-color: #00bfff;
+      color: #000;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0090cc;
+    }
+
+    .feedback {
+      background-color: #001f3f;
+      border-left: 5px solid #00bfff;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .loading {
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <header>Smart Emotional Tutor & Career Coach</header>
+  <main>
+    <section>
+      <h2>Upload Your Practice Materials</h2>
+      <form id="analysisForm">
+        <label for="video">Video File:</label>
+        <input type="file" id="video" name="video" accept="video/*" />
+
+        <label for="audio">Audio File:</label>
+        <input type="file" id="audio" name="audio" accept="audio/*" />
+
+        <label for="prompt">Coaching Prompt:</label>
+        <textarea id="prompt" name="text_prompt" placeholder="e.g., How do I sound in a job interview?"></textarea>
+
+        <button type="submit">Start Analysis</button>
+      </form>
+    </section>
+
+    <div class="feedback" id="feedback">
+      Feedback will appear here after analysis.
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('analysisForm');
+    const feedback = document.getElementById('feedback');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      feedback.textContent = 'Analyzing...';
+      feedback.classList.add('loading');
+
+      const formData = new FormData();
+      const videoFile = document.getElementById('video').files[0];
+      const audioFile = document.getElementById('audio').files[0];
+      const prompt = document.getElementById('prompt').value;
+
+      if (videoFile) formData.append('video', videoFile);
+      if (audioFile) formData.append('audio', audioFile);
+      if (prompt.trim()) formData.append('text_prompt', prompt);
+
+      try {
+        const response = await fetch('/analyze', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error('Server error');
+        }
+
+        const data = await response.json();
+        feedback.classList.remove('loading');
+        feedback.innerHTML = `
+          <strong>Video Emotions:</strong> ${data.video_emotions?.join(', ') || 'N/A'}<br/>
+          <strong>Audio Pitch:</strong> ${data.audio_analysis?.average_pitch || 'N/A'}<br/>
+          <strong>Intensity:</strong> ${data.audio_analysis?.intensity || 'N/A'}<br/>
+          <strong>Coaching Feedback:</strong> ${data.coaching_feedback || 'N/A'}
+        `;
+      } catch (err) {
+        feedback.classList.remove('loading');
+        feedback.textContent = 'Error analyzing performance. Please check your Flask backend and ensure it is running.';
+      }
+    });
+  </script>
+</body>
+</html>
